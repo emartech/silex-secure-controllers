@@ -1,0 +1,34 @@
+{
+  "name": "emartech/silex-secure-controllers",
+  "description": "helper classes and wrappers to ensure that requests are authenticated by default",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "require": {
+    "php": "~7.1",
+    "silex/silex": "~2.0",
+    "monolog/monolog": "^1.0",
+    "emartech/escher" : "1.0.*",
+    "firebase/php-jwt": "^4.0",
+    "emartech/php-jwt-helper": "0.1.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0",
+    "emartech/php-test-helpers": "~0.2"
+  },
+  "autoload": {
+    "psr-4": {"Emartech\\Silex\\SecureController\\": "src/"}
+  },
+  "authors": [
+    {
+      "name": "fqqdk",
+      "email": "fqqdk1@gmail.com"
+    },
+    {
+      "name": "stvan",
+      "email": "sz.stvan@outlook.com"
+    }
+  ],
+  "scripts": {
+    "test": "vendor/bin/phpunit test/"
+  }
+}
