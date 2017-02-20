@@ -9,6 +9,7 @@ use Escher\Provider as EscherProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class RequestSecurityTest extends BaseTestCase
 {
@@ -77,9 +78,11 @@ class RequestSecurityTest extends BaseTestCase
     private function getRequestMockWithProtocol($protocol)
     {
         $request = $this->mock(Request::class);
-        $request->expects($this->once())
-            ->method('isSecure')
-            ->will($this->returnValue($protocol === 'https'));
+        $request->headers = $this->mock(ParameterBag::class);
+        $request->headers->expects($this->once())
+            ->method('get')
+            ->with('X-Forwarded-Proto', 'http')
+            ->will($this->returnValue($protocol));
 
         return $request;
     }

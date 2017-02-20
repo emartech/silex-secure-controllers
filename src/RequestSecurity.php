@@ -42,7 +42,7 @@ class RequestSecurity
 
     public function forceHttps(Request $request)
     {
-        if ($request->isSecure()) {
+        if ($this->forwardedProtocolIsHttps($request)) {
             return null;
         }
 
@@ -52,6 +52,21 @@ class RequestSecurity
             'error_name' => 'forwarded_protocol_not_https',
         ]));
         return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
+    }
+
+    private function forwardedProtocolIsHttps(Request $request) : bool
+    {
+        return 'https' == $request->headers->get('X-Forwarded-Proto', 'http');
+    }
+
+    public function getScheme(Request $request) : string
+    {
+        $scheme = $request->getScheme();
+        if ($this->forwardedProtocolIsHttps($request)) {
+            $scheme = 'https';
+            return $scheme;
+        }
+        return $scheme;
     }
 
     public function jwtAuthenticate(Request $request)
