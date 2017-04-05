@@ -18,17 +18,23 @@ class ProviderWrapper implements ControllerProviderInterface
      */
     private $requestSecurity;
 
+    /**
+     * @var string
+     */
+    private $environment;
 
-    public function __construct(Provider $delegate, RequestSecurity $requestSecurity)
+
+    public function __construct(Provider $delegate, RequestSecurity $requestSecurity, string $environment)
     {
         $this->delegate = $delegate;
         $this->requestSecurity = $requestSecurity;
+        $this->environment = $environment;
     }
 
     public function connect(Application $app): ControllerCollection
     {
         $controllers = $app['controllers_factory'];
-        $this->delegate->setupActions(new Collection($app, $controllers, $this->requestSecurity));
+        $this->delegate->setupActions(new Collection($app, $controllers, $this->requestSecurity, $this->environment));
         return $controllers;
     }
 }

@@ -47,7 +47,7 @@ class Collection
     public function mount($prefix, $controllers)
     {
         if ($controllers instanceof Provider) {
-            $wrapped = new ProviderWrapper($controllers, $this->requestSecurity);
+            $wrapped = new ProviderWrapper($controllers, $this->requestSecurity, $this->environment);
             $controllers = $wrapped->connect($this->application);
         } else if ($controllers instanceof ControllerProviderInterface || $controllers instanceof ControllerCollection) {
             throw new LogicException("Please use SecureControllerProvider instances!");
