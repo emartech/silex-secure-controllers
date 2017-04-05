@@ -24,15 +24,19 @@ class Collection
      * @var RequestSecurity
      */
     private $requestSecurity;
+
+    /**
+     * @var string
+     */
     private $environment;
 
 
-    public static function createRoot(Application $application, RequestSecurity $requestSecurity, string $environment = APPLICATION_ENV)
+    public static function createRoot(Application $application, RequestSecurity $requestSecurity, $environment)
     {
-        return new self($application, $application['controllers'], $requestSecurity,  $environment);
+        return new self($application, $application['controllers'], $requestSecurity, $environment);
     }
 
-    public function __construct(Application $application, ControllerCollection $collection, RequestSecurity $requestSecurity, $environment = APPLICATION_ENV)
+    public function __construct(Application $application, ControllerCollection $collection, RequestSecurity $requestSecurity, $environment)
     {
         $this->application = $application;
         $this->collection = $collection;
@@ -104,6 +108,13 @@ class Collection
     public function noAuth(): callable
     {
         return function () {};
+    }
+
+    public function session(): callable
+    {
+        return function () {
+            return $this->requestSecurity->validateSession();
+        };
     }
 
     public function escherAuth(): callable

@@ -1,6 +1,6 @@
 <?php
 
-use Emartech\Silex\SecureController\RequestSecurity;
+use Emartech\Silex\SecureController\BasicRequestSecurity;
 use Emartech\TestHelper\BaseTestCase;
 use Escher\Escher;
 use Escher\Exception as EscherException;
@@ -15,17 +15,19 @@ class RequestSecurityTest extends BaseTestCase
 {
     /** @var EscherProvider|PHPUnit_Framework_MockObject_MockObject */
     private $escherProviderMock;
+
     /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
     private $loggerMock;
-    /** @var RequestSecurity */
-    private $subject;
+
+    /** @var BasicRequestSecurity */
+    private $requestSecurity;
 
 
     public function setUp()
     {
         $this->escherProviderMock = $this->mock(EscherProvider::class);
         $this->loggerMock = $this->mock(LoggerInterface::class);
-        $this->subject = new RequestSecurity($this->loggerMock, $this->escherProviderMock);
+        $this->requestSecurity = new BasicRequestSecurity($this->loggerMock, $this->escherProviderMock);
     }
 
     /**
@@ -38,7 +40,7 @@ class RequestSecurityTest extends BaseTestCase
             ->method('createEscher')
             ->will($this->throwException(new EscherException()));
 
-        $actual = $this->subject->escherAuthenticate();
+        $actual = $this->requestSecurity->escherAuthenticate();
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $actual->getStatusCode());
     }
@@ -53,7 +55,7 @@ class RequestSecurityTest extends BaseTestCase
             ->method('createEscher')
             ->will($this->returnValue($this->mock(Escher::class)));
 
-        $this->assertNull($this->subject->escherAuthenticate());
+        $this->assertNull($this->requestSecurity->escherAuthenticate());
     }
 
     /**
@@ -62,7 +64,7 @@ class RequestSecurityTest extends BaseTestCase
     public function forceHttps_ProdEnvWithHttp_BadRequest()
     {
         $request = $this->getRequestMockWithProtocol('http');
-        $actual = $this->subject->forceHttps($request);
+        $actual = $this->requestSecurity->forceHttps($request);
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $actual->getStatusCode());
     }
 
@@ -72,18 +74,21 @@ class RequestSecurityTest extends BaseTestCase
     public function forceHttps_ProdEnvWithHttps_BadRequest()
     {
         $request = $this->getRequestMockWithProtocol('https');
-        $this->assertNull($this->subject->forceHttps($request));
+        $this->assertNull($this->requestSecurity->forceHttps($request));
     }
 
     private function getRequestMockWithProtocol($protocol)
     {
-        $request = $this->mock(Request::class);
-        $request->headers = $this->mock(ParameterBag::class);
-        $request->headers->expects($this->once())
+        /** @var ParameterBag|PHPUnit_Framework_MockObject_MockObject $headers */
+        $headers = $this->mock(ParameterBag::class);
+        $headers->expects($this->once())
             ->method('get')
             ->with('X-Forwarded-Proto', 'http')
             ->will($this->returnValue($protocol));
 
+        /** @var Request|PHPUnit_Framework_MockObject_MockObject $request */
+        $request = $this->mock(Request::class);
+        $request->headers = $headers;
         return $request;
     }
 }
