@@ -112,8 +112,8 @@ class Collection
 
     public function session(): callable
     {
-        return function () {
-            return $this->requestSecurity->validateSession();
+        return function (Request $request) {
+            return $this->requestSecurity->validateSession($request);
         };
     }
 

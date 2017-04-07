@@ -38,9 +38,9 @@ class SessionRequestSecurity implements RequestSecurity
         $this->logger = $logger;
     }
 
-    public function validateSession()
+    public function validateSession(Request $request)
     {
-        if (!$this->sessionValidator->isValid($this->session)) {
+        if (!$this->sessionValidator->isValid($this->session, $request)) {
             $this->logger->error(json_encode([
                 'error_message' => "Invalid session",
                 'error_class' => "Invalid session",

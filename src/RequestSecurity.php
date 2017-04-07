@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface RequestSecurity
 {
-    public function validateSession();
+    public function validateSession(Request $request);
 
     public function escherAuthenticate();
 

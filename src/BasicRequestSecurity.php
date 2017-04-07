@@ -23,7 +23,7 @@ class BasicRequestSecurity implements RequestSecurity
         $this->escherProvider = $escherProvider;
     }
 
-    public function validateSession()
+    public function validateSession(Request $request)
     {
         return null;
     }

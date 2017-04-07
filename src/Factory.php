@@ -40,9 +40,9 @@ class Factory
         return $this->createCollection($environment, $this->createSessionSecurity($sessionValidator));
     }
 
-    public function createCollectionWithSessionKey(string $environment, string $sessionKey)
+    public function createCollectionWithSessionKey(string $environment, string $sessionKey, string $urlKey)
     {
-        return $this->createCollectionWithSession($environment, new KeyExistenceSessionValidator($sessionKey));
+        return $this->createCollectionWithSession($environment, new UrlSessionValidator($sessionKey, $urlKey));
     }
 
     private function createBasicSecurity(): BasicRequestSecurity
