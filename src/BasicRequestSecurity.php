@@ -80,6 +80,7 @@ class BasicRequestSecurity implements RequestSecurity
 
         if (!$authHeader) {
             $this->logger->error('Authorization header missing');
+            return new Response('Token validation failed', Response::HTTP_UNAUTHORIZED);
         }
 
         try {
