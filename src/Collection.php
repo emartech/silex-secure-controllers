@@ -119,8 +119,8 @@ class Collection
 
     public function escherAuth(): callable
     {
-        return function () {
-            return $this->requestSecurity->escherAuthenticate();
+        return function (Request $request) {
+            return $this->requestSecurity->escherAuthenticate($request);
         };
     }
 

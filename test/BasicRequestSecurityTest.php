@@ -22,12 +22,16 @@ class RequestSecurityTest extends BaseTestCase
     /** @var BasicRequestSecurity */
     private $requestSecurity;
 
+    /** @var Request */
+    private $request;
+
 
     public function setUp()
     {
         $this->escherProviderMock = $this->mock(EscherProvider::class);
         $this->loggerMock = $this->mock(LoggerInterface::class);
         $this->requestSecurity = new BasicRequestSecurity($this->loggerMock, $this->escherProviderMock);
+        $this->request = new Request();
     }
 
     /**
@@ -40,7 +44,7 @@ class RequestSecurityTest extends BaseTestCase
             ->method('createEscher')
             ->will($this->throwException(new EscherException()));
 
-        $actual = $this->requestSecurity->escherAuthenticate();
+        $actual = $this->requestSecurity->escherAuthenticate($this->request);
 
         $this->assertEquals(Response::HTTP_UNAUTHORIZED, $actual->getStatusCode());
     }
@@ -55,7 +59,7 @@ class RequestSecurityTest extends BaseTestCase
             ->method('createEscher')
             ->will($this->returnValue($this->mock(Escher::class)));
 
-        $this->assertNull($this->requestSecurity->escherAuthenticate());
+        $this->assertNull($this->requestSecurity->escherAuthenticate($this->request));
     }
 
     /**

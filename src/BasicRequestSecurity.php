@@ -28,10 +28,13 @@ class BasicRequestSecurity implements RequestSecurity
         return null;
     }
 
-    public function escherAuthenticate()
+    public function escherAuthenticate(Request $request)
     {
         try {
-            $this->escherProvider->createEscher()->authenticate($this->escherProvider->getKeyDB());
+            $this->escherProvider->createEscher()->authenticate(
+                $this->escherProvider->getKeyDB(),
+                $request->server->all()
+            );
 
             return null;
         } catch (EscherException $ex) {

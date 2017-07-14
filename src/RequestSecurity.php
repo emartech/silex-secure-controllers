@@ -9,7 +9,7 @@ interface RequestSecurity
 {
     public function validateSession(Request $request);
 
-    public function escherAuthenticate();
+    public function escherAuthenticate(Request $request);
 
     public function forceHttps(Request $request);
 

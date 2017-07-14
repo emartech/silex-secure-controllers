@@ -53,9 +53,9 @@ class SessionRequestSecurity implements RequestSecurity
         return null;
     }
 
-    public function escherAuthenticate()
+    public function escherAuthenticate(Request $request)
     {
-        return $this->delegate->escherAuthenticate();
+        return $this->delegate->escherAuthenticate($request);
     }
 
     public function forceHttps(Request $request)
