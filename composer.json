@@ -2,7 +2,9 @@
   "name": "emartech/silex-secure-controllers",
   "description": "helper classes and wrappers to ensure that requests are authenticated by default",
   "minimum-stability": "stable",
-  "license": "proprietary",
+  "license": [
+    "MIT"
+  ],
   "require": {
     "php": "~7.1",
     "silex/silex": "~2.0",
