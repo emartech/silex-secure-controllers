@@ -9,7 +9,7 @@
     "php": "~7.1",
     "silex/silex": "~2.0",
     "monolog/monolog": "^1.0",
-    "emartech/escher" : "1.0.*",
+    "emartech/escher" : "1.1.0",
     "firebase/php-jwt": "^4.0",
     "emartech/php-jwt-helper": "0.1.*"
   },
