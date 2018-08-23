@@ -23,6 +23,9 @@ tests: ## Run tests
 install: ## Install dependencies
 	$(docker-run) "composer install 2>&1"
 
+update: ## Update dependencies
+	$(docker-run) "composer update 2>&1"
+
 define destroy_containers
 	docker container rm --force `docker container ls --all --quiet --filter name=$(1)` 2>/dev/null
 endef
