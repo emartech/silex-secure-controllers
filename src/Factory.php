@@ -8,18 +8,8 @@ use Silex\Application;
 
 class Factory
 {
-    /**
-     * @var Application
-     */
     private $app;
-
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-    /**
-     * @var EscherProvider
-     */
     private $escherProvider;
 
 

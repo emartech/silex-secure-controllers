@@ -38,12 +38,7 @@ class BasicRequestSecurity implements RequestSecurity
 
             return null;
         } catch (EscherException $ex) {
-            $this->logger->error(json_encode([
-                'error_message' => $ex->getMessage(),
-                'error_class' => get_class($ex),
-                'error_name' => 'escher_auth_failure',
-                'error_code' => $ex->getCode(),
-            ]));
+            $this->logger->error('escher_auth_failure', ['exception' => $ex]);
             return new Response($ex->getMessage(), Response::HTTP_UNAUTHORIZED);
         }
     }
@@ -55,10 +50,7 @@ class BasicRequestSecurity implements RequestSecurity
         }
 
         $errorMessage = 'Service only works over HTTPS protocol.';
-        $this->logger->info(json_encode([
-            'error_message' => $errorMessage,
-            'error_name' => 'forwarded_protocol_not_https',
-        ]));
+        $this->logger->info($errorMessage);
         return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
     }
 
@@ -91,8 +83,9 @@ class BasicRequestSecurity implements RequestSecurity
 
             return null;
         } catch (\Exception $ex) {
-            $this->logger->error('JWT token validation failed: ' . $ex->getMessage());
-            $this->logger->debug((string)$ex);
+            $errorMessage = 'JWT token validation failed' . $ex->getMessage();
+            $this->logger->error($errorMessage);
+            $this->logger->debug($errorMessage, [ 'exception' => $ex ]);
             return new Response('Token validation failed', Response::HTTP_UNAUTHORIZED);
         }
     }

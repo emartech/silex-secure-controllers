@@ -41,12 +41,10 @@ class SessionRequestSecurity implements RequestSecurity
     public function validateSession(Request $request)
     {
         if (!$this->sessionValidator->isValid($this->session, $request)) {
-            $this->logger->error(json_encode([
+            $this->logger->error('session_validation_failure', [
                 'error_message' => "Invalid session",
-                'error_class' => "Invalid session",
-                'error_name' => 'session_validation_failure',
                 'error_code' => 1,
-            ]));
+            ]);
 
             return new Response("Invalid session", Response::HTTP_UNAUTHORIZED);
         }
