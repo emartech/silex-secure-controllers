@@ -24,5 +24,5 @@ $ make update
 Run tests:
 
 ```
-$ make tests
+$ make test
 ```

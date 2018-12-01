@@ -1,6 +1,6 @@
-NAME 						:= silex-secure-controllers
+NAME 				:= silex-secure-controllers
 docker-build		:= docker build --force-rm --no-cache --pull --tag
-docker-run			:= docker run --rm --volume $(PWD):/var/www/html/ $(NAME) bash -c
+docker-run			:= docker run --rm --volume "$$(PWD)":/var/www/html/ $(NAME) bash -c
 
 .PHONY: help
 
@@ -15,14 +15,17 @@ destroy: ## Destroy containers and images
 	-$(call destroy_images,$(NAME))
 
 build: ## Build image
-	$(docker-build) $(NAME) ./
+	$(docker-build) $(NAME) .
 
-tests: ## Run tests
+test: tests ## Run tests
+tests:
 	$(docker-run) "composer test"
 
+packages: install
 install: ## Install dependencies
 	$(docker-run) "composer install 2>&1"
 
+pu: update
 update: ## Update dependencies
 	$(docker-run) "composer update 2>&1"
 
