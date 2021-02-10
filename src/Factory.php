@@ -4,6 +4,7 @@ namespace Emartech\Silex\SecureController;
 
 use Escher\Provider as EscherProvider;
 use Psr\Log\LoggerInterface;
+use SessionValidator\Client;
 use Silex\Application;
 
 class Factory
@@ -37,7 +38,15 @@ class Factory
 
     private function createBasicSecurity(): BasicRequestSecurity
     {
-        return new BasicRequestSecurity($this->logger, $this->escherProvider);
+        return new BasicRequestSecurity(
+            $this->logger,
+            $this->escherProvider,
+            Client::create(
+                getenv('SESSION_VALIDATOR_URL'),
+                getenv('SESSION_VALIDATOR_ESCHER_KEY'),
+                getenv('SESSION_VALIDATOR_ESCHER_SECRET')
+            )
+        );
     }
 
     private function createSessionSecurity(SessionValidator $sessionValidator): SessionRequestSecurity

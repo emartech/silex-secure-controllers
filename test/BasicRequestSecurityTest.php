@@ -1,5 +1,6 @@
 <?php
 
+use Emartech\Jwt\Jwt;
 use Emartech\Silex\SecureController\BasicRequestSecurity;
 use Emartech\TestHelper\BaseTestCase;
 use Escher\Escher;
@@ -7,6 +8,7 @@ use Escher\Exception as EscherException;
 use Escher\Provider as EscherProvider;
 
 use Psr\Log\LoggerInterface;
+use SessionValidator\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -25,12 +27,18 @@ class RequestSecurityTest extends BaseTestCase
     /** @var Request */
     private $request;
 
+    /**
+     * @var Client|PHPUnit_Framework_MockObject_MockObject
+     */
+    private $sessionValidatorClient;
+
 
     public function setUp()
     {
         $this->escherProviderMock = $this->mock(EscherProvider::class);
         $this->loggerMock = $this->mock(LoggerInterface::class);
-        $this->requestSecurity = new BasicRequestSecurity($this->loggerMock, $this->escherProviderMock);
+        $this->sessionValidatorClient = $this->mock(Client::class);
+        $this->requestSecurity = new BasicRequestSecurity($this->loggerMock, $this->escherProviderMock, $this->sessionValidatorClient);
         $this->request = new Request();
     }
 
@@ -79,6 +87,71 @@ class RequestSecurityTest extends BaseTestCase
     {
         $request = $this->getRequestMockWithProtocol('https');
         $this->assertNull($this->requestSecurity->forceHttps($request));
+    }
+
+    /**
+     * @test
+     */
+    public function jwtAuthenticate_authHeaderMissing_Unauthorized()
+    {
+        $request = $this->getRequestWithAuthorizationHeader('');
+        $response = $this->requestSecurity->jwtAuthenticate($request);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function jwtAuthenticate_JWTAuthFails_Unauthorized()
+    {
+        $request = $this->getRequestWithAuthorizationHeader("invalid jwt");
+        $response = $this->requestSecurity->jwtAuthenticate($request);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function jwtAuthenticate_MsidMissing_Unauthorized()
+    {
+        putenv('JWT_SECRET=some_secret');
+        $jwt = Jwt::create()->generateToken([]);
+        $request = $this->getRequestWithAuthorizationHeader("Bearer $jwt");
+
+        $response = $this->requestSecurity->jwtAuthenticate($request);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function jwtAuthenticate_MsidInvalid_Unauthorized()
+    {
+        putenv('JWT_SECRET=some_secret');
+        $jwt = Jwt::create()->generateToken([
+            'msid' => 'some id'
+        ]);
+        $request = $this->getRequestWithAuthorizationHeader("Bearer $jwt");
+
+        $this->sessionValidatorClient->expects($this->once())->method('isValid')->willReturn(false);
+
+        $response = $this->requestSecurity->jwtAuthenticate($request);
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
+    }
+
+    private function getRequestWithAuthorizationHeader($authHeader): Request
+    {
+        $headers = $this->mock(ParameterBag::class);
+        $headers->expects($this->once())
+            ->method('get')
+            ->with('Authorization')
+            ->willReturn($authHeader);
+
+        /** @var Request|PHPUnit_Framework_MockObject_MockObject $request */
+        $request = $this->mock(Request::class);
+        $request->headers = $headers;
+
+        return $request;
     }
 
     private function getRequestMockWithProtocol($protocol)

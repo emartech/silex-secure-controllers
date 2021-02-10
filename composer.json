@@ -11,7 +11,8 @@
     "monolog/monolog": "^1.0",
     "emartech/escher" : "1.1.0",
     "firebase/php-jwt": "^4.0",
-    "emartech/php-jwt-helper": "0.1.*"
+    "emartech/php-jwt-helper": "0.1.*",
+    "emartech/session-validator-client": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.0",

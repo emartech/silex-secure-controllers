@@ -6,21 +6,23 @@ use Psr\Log\LoggerInterface;
 use Escher\Provider as EscherProvider;
 use Escher\Exception as EscherException;
 
+use SessionValidator\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Emartech\Jwt\Jwt;
-
 
 class BasicRequestSecurity implements RequestSecurity
 {
     private $escherProvider;
     private $logger;
+    private $client;
 
 
-    public function __construct(LoggerInterface $logger, EscherProvider $escherProvider)
+    public function __construct(LoggerInterface $logger, EscherProvider $escherProvider, Client $client)
     {
         $this->logger = $logger;
         $this->escherProvider = $escherProvider;
+        $this->client = $client;
     }
 
     public function validateSession(Request $request)
@@ -79,14 +81,27 @@ class BasicRequestSecurity implements RequestSecurity
         }
 
         try {
-            Jwt::create()->parseHeader($authHeader);
+            $this->validateJWT($authHeader);
 
             return null;
         } catch (\Exception $ex) {
-            $errorMessage = 'JWT token validation failed' . $ex->getMessage();
+            $errorMessage = 'JWT token validation failed: ' . $ex->getMessage();
             $this->logger->error($errorMessage);
             $this->logger->debug($errorMessage, [ 'exception' => $ex ]);
             return new Response('Token validation failed', Response::HTTP_UNAUTHORIZED);
+        }
+    }
+
+    private function validateJWT(string $authHeader): void
+    {
+        $jwt = Jwt::create()->parseHeader($authHeader);
+
+        if (!isset($jwt->data->msid)) {
+            throw new \Exception('MSID is missing');
+        }
+
+        if (!$this->client->isValid($jwt->data->msid)) {
+            throw new \Exception('MSID is not valid');
         }
     }
 }
