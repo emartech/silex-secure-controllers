@@ -68,6 +68,6 @@ class SessionRequestSecurity implements RequestSecurity
 
     public function jwtAuthenticate(Request $request)
     {
-        return $this->jwtAuthenticate($request);
+        return $this->delegate->jwtAuthenticate($request);
     }
 }
