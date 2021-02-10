@@ -96,11 +96,11 @@ class BasicRequestSecurity implements RequestSecurity
     {
         $jwt = Jwt::create()->parseHeader($authHeader);
 
-        if (!isset($jwt->data->msid)) {
+        if (!isset($jwt->msid)) {
             throw new \Exception('MSID is missing');
         }
 
-        if (!$this->client->isValid($jwt->data->msid)) {
+        if (!$this->client->isValid($jwt->msid)) {
             throw new \Exception('MSID is not valid');
         }
     }

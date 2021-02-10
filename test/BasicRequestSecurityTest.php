@@ -1,12 +1,12 @@
 <?php
 
-use Emartech\Jwt\Jwt;
 use Emartech\Silex\SecureController\BasicRequestSecurity;
 use Emartech\TestHelper\BaseTestCase;
 use Escher\Escher;
 use Escher\Exception as EscherException;
 use Escher\Provider as EscherProvider;
 
+use Firebase\JWT\JWT;
 use Psr\Log\LoggerInterface;
 use SessionValidator\Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -114,8 +114,9 @@ class RequestSecurityTest extends BaseTestCase
      */
     public function jwtAuthenticate_MsidMissing_Unauthorized()
     {
-        putenv('JWT_SECRET=some_secret');
-        $jwt = Jwt::create()->generateToken([]);
+        $secret = 'some_secret';
+        putenv("JWT_SECRET=$secret");
+        $jwt = JWT::encode(['customerId' => 1], $secret);
         $request = $this->getRequestWithAuthorizationHeader("Bearer $jwt");
 
         $response = $this->requestSecurity->jwtAuthenticate($request);
@@ -127,10 +128,9 @@ class RequestSecurityTest extends BaseTestCase
      */
     public function jwtAuthenticate_MsidInvalid_Unauthorized()
     {
-        putenv('JWT_SECRET=some_secret');
-        $jwt = Jwt::create()->generateToken([
-            'msid' => 'some id'
-        ]);
+        $secret = 'some_secret';
+        putenv("JWT_SECRET=$secret");
+        $jwt = JWT::encode(['msid' => 'some id'], $secret);
         $request = $this->getRequestWithAuthorizationHeader("Bearer $jwt");
 
         $this->sessionValidatorClient->expects($this->once())->method('isValid')->willReturn(false);
