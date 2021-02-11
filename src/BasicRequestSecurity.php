@@ -96,6 +96,8 @@ class BasicRequestSecurity implements RequestSecurity
     {
         $jwt = Jwt::create()->parseHeader($authHeader);
 
+        $this->logger->debug("Validating session", ['msid' => $jwt->msid]);
+
         if (!isset($jwt->msid)) {
             throw new \Exception('MSID is missing');
         }
