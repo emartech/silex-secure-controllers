@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Escher\Provider as EscherProvider;
 use Escher\Exception as EscherException;
 
-use SessionValidator\Client;
+use SessionValidator\ClientInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Emartech\Jwt\Jwt;
@@ -18,7 +18,7 @@ class BasicRequestSecurity implements RequestSecurity
     private $client;
 
 
-    public function __construct(LoggerInterface $logger, EscherProvider $escherProvider, Client $client)
+    public function __construct(LoggerInterface $logger, EscherProvider $escherProvider, ClientInterface $client)
     {
         $this->logger = $logger;
         $this->escherProvider = $escherProvider;
