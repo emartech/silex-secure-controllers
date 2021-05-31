@@ -7,16 +7,16 @@
   ],
   "require": {
     "php": "~7.3",
-    "silex/silex": "~2.0",
-    "monolog/monolog": "^1.0",
-    "emartech/escher" : "1.1.0",
-    "firebase/php-jwt": "^4.0",
-    "emartech/php-jwt-helper": "0.1.*",
+    "silex/silex": "*",
+    "monolog/monolog": "*",
+    "emartech/escher" : "*",
+    "firebase/php-jwt": "*",
+    "emartech/php-jwt-helper": "*",
     "emartech/session-validator-client": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.0",
-    "emartech/php-test-helpers": "~0.2"
+    "phpunit/phpunit": "~8.4",
+    "emartech/php-test-helpers": "~1.1"
   },
   "autoload": {
     "psr-4": {"Emartech\\Silex\\SecureController\\": "src/"}

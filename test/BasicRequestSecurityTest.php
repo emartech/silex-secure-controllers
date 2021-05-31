@@ -7,6 +7,7 @@ use Escher\Exception as EscherException;
 use Escher\Provider as EscherProvider;
 
 use Firebase\JWT\JWT;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use SessionValidator\Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +16,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class RequestSecurityTest extends BaseTestCase
 {
-    /** @var EscherProvider|PHPUnit_Framework_MockObject_MockObject */
+    /** @var EscherProvider|MockObject */
     private $escherProviderMock;
-
-    /** @var LoggerInterface|PHPUnit_Framework_MockObject_MockObject */
-    private $loggerMock;
 
     /** @var BasicRequestSecurity */
     private $requestSecurity;
@@ -27,18 +25,16 @@ class RequestSecurityTest extends BaseTestCase
     /** @var Request */
     private $request;
 
-    /**
-     * @var Client|PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Client|MockObject */
     private $sessionValidatorClient;
 
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->escherProviderMock = $this->mock(EscherProvider::class);
-        $this->loggerMock = $this->mock(LoggerInterface::class);
-        $this->sessionValidatorClient = $this->mock(Client::class);
-        $this->requestSecurity = new BasicRequestSecurity($this->loggerMock, $this->escherProviderMock, $this->sessionValidatorClient);
+        $this->escherProviderMock = $this->createMock(EscherProvider::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->sessionValidatorClient = $this->createMock(Client::class);
+        $this->requestSecurity = new BasicRequestSecurity($logger, $this->escherProviderMock, $this->sessionValidatorClient);
         $this->request = new Request();
     }
 
@@ -50,7 +46,7 @@ class RequestSecurityTest extends BaseTestCase
         $this->escherProviderMock
             ->expects($this->once())
             ->method('createEscher')
-            ->will($this->throwException(new EscherException()));
+            ->willThrowException(new EscherException());
 
         $actual = $this->requestSecurity->escherAuthenticate($this->request);
 
@@ -65,7 +61,7 @@ class RequestSecurityTest extends BaseTestCase
         $this->escherProviderMock
             ->expects($this->once())
             ->method('createEscher')
-            ->will($this->returnValue($this->mock(Escher::class)));
+            ->willReturn($this->createMock(Escher::class));
 
         $this->assertNull($this->requestSecurity->escherAuthenticate($this->request));
     }
@@ -141,14 +137,14 @@ class RequestSecurityTest extends BaseTestCase
 
     private function getRequestWithAuthorizationHeader($authHeader): Request
     {
-        $headers = $this->mock(ParameterBag::class);
+        $headers = $this->createMock(ParameterBag::class);
         $headers->expects($this->once())
             ->method('get')
             ->with('Authorization')
             ->willReturn($authHeader);
 
-        /** @var Request|PHPUnit_Framework_MockObject_MockObject $request */
-        $request = $this->mock(Request::class);
+        /** @var Request|MockObject $request */
+        $request = $this->createMock(Request::class);
         $request->headers = $headers;
 
         return $request;
@@ -156,15 +152,15 @@ class RequestSecurityTest extends BaseTestCase
 
     private function getRequestMockWithProtocol($protocol)
     {
-        /** @var ParameterBag|PHPUnit_Framework_MockObject_MockObject $headers */
-        $headers = $this->mock(ParameterBag::class);
+        /** @var ParameterBag|MockObject $headers */
+        $headers = $this->createMock(ParameterBag::class);
         $headers->expects($this->once())
             ->method('get')
             ->with('X-Forwarded-Proto', 'http')
             ->will($this->returnValue($protocol));
 
-        /** @var Request|PHPUnit_Framework_MockObject_MockObject $request */
-        $request = $this->mock(Request::class);
+        /** @var Request|MockObject $request */
+        $request = $this->createMock(Request::class);
         $request->headers = $headers;
         return $request;
     }
